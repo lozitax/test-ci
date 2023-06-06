@@ -2,13 +2,27 @@ name: compile-app-and-list-files
 run-name: ${{ github.actor }} est en train de compiler l'application et d'afficher la liste des fichiers
 on: [push]
 jobs:
-  compile-app-and-list-files:
+  # compile-app-and-list-files:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: '18'
+  #     - run: npm install
+  #     - run: npm run build
+  #     - run: npm run e2e:headless
+  deploy:
     runs-on: ubuntu-latest
+    
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan ${{ secrets.SSH_HOST }} >> ~/.ssh/known_hosts
+        chmod 644 ~/.ssh/known_hosts
+
+      - users: webfactory/ssh-agent@v0.5.4
         with:
-          node-version: '18'
-      - run: npm install
-      - run: npm run build
-      - run: ls -a
+          ssh-private-key: ${{ secrets.SSH_KEY }}
+
+      - run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd test-ci/ && git pull && npm install && npm run build && pm2 stop npm && pm2 start npm"
