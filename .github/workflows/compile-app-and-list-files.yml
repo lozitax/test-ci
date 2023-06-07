@@ -37,4 +37,4 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
-      - run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd test-ci/ && git docker pull ghcr.io/lozitax/test-ci:latest"
+      - run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd test-ci/ && docker pull ghcr.io/lozitax/test-ci:latest"
