@@ -27,6 +27,7 @@ jobs:
           tags: ghcr.io/${{ github.repository }}:latest
   get-image-on-server:
     runs-on: ubuntu-latest
+    needs: build-and-push-image
     steps:
       - run: |
           mkdir -p ~/.ssh
@@ -37,4 +38,6 @@ jobs:
         with:
           ssh-private-key: ${{ secrets.SSH_KEY }}
 
-      - run: ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "cd test-ci/ && docker pull ghcr.io/lozitax/test-ci:latest"
+      - run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SSH_HOST }} "\
+          sudo docker compose -f docker-compose.prod.yml up -d --pull always"
